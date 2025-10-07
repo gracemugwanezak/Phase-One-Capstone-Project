@@ -1,14 +1,13 @@
 package DAO;
 
-
-
 import DB.DatabaseConnection;
+import model.Course;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CourseDAO {
-    private final Connection conn;
+    private Connection conn;
 
     public CourseDAO() {
         conn = DatabaseConnection.getInstance().getConnection();
@@ -22,22 +21,20 @@ public class CourseDAO {
             pstmt.executeUpdate();
             System.out.println(" Course added successfully!");
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(" Error adding course: " + e.getMessage());
         }
     }
 
-    public List<String> getAllCourses() {
-        List<String> courses = new ArrayList<>();
+    public List<Course> getAllCourses() {
+        List<Course> courses = new ArrayList<>();
         String sql = "SELECT * FROM courses";
-        try (Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+        try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
-                courses.add(rs.getInt("id") + " | " + rs.getString("title") + " | " + rs.getInt("credits") + " credits");
+                courses.add(new Course(rs.getInt("id"), rs.getString("title"), rs.getInt("credits")));
             }
         } catch (SQLException e) {
-            System.out.println("Failed to add course");
+            System.out.println(" Error fetching courses: " + e.getMessage());
         }
         return courses;
     }
 }
-
